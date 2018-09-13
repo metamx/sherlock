@@ -43,6 +43,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -94,17 +95,23 @@ public class JobExecutionService {
         try {
             List<Anomaly> anomalies;
             List<AnomalyReport> reports = new ArrayList<>();
+            Optional<Exception> error = Optional.empty();
             job.setJobStatus(JobStatus.RUNNING.getValue());
             try {
                 anomalies = executeJob(job, druidClusterAccessor.getDruidCluster(job.getClusterId()));
                 reports = getReports(anomalies, job);
             } catch (SherlockException | ClusterNotFoundException e) {
+                error = Optional.of(e);
                 log.error("Error while executing job: [{}]", job.getJobId(), e);
-                unscheduleErroredJob(job);
+                if (!CLISettings.CONTINUE_ON_ERROR) {
+                    log.warn("Unscheduling job: [{}]", job.getJobId());
+                    unscheduleErroredJob(job);
+                }
             }
             EmailService emailService = serviceFactory.newEmailServiceInstance();
             if (reports.isEmpty()) {
-                AnomalyReport report = getSingletonReport(job);
+                AnomalyReport report = error.map(e -> getSingletonReport(job, e.getMessage()))
+                                            .orElse(getSingletonReport(job));
                 reports.add(report);
                 if (report.getStatus().equals(Constants.ERROR) && CLISettings.ENABLE_EMAIL) {
                     if (!emailService.sendEmail(CLISettings.FAILURE_EMAIL, CLISettings.FAILURE_EMAIL, reports)) {
@@ -391,9 +398,10 @@ public class JobExecutionService {
      * or if the job errored.
      *
      * @param job the detection job
+     * @param errorDescription error description (null or empty string if everything is fine)
      * @return a SUCCESS or ERROR or NODATA report
      */
-    public synchronized AnomalyReport getSingletonReport(JobMetadata job) {
+    public synchronized AnomalyReport getSingletonReport(JobMetadata job, String errorDescription) {
         AnomalyReport report = new AnomalyReport();
         report.setJobFrequency(job.getFrequency());
         report.setJobId(job.getJobId());
@@ -404,6 +412,9 @@ public class JobExecutionService {
         if (JobStatus.ERROR.getValue().equals(job.getJobStatus())) {
             log.info("Job [{}] completed with error", job.getJobId());
             report.setStatus(Constants.ERROR);
+            if (errorDescription != null && !errorDescription.isEmpty()) {
+                report.setErrorDescription(errorDescription);
+            }
         } else if (JobStatus.NODATA.getValue().equals(job.getJobStatus())) {
             log.info("No data returned from druid for Job [{}]", job.getJobId());
             report.setStatus(Constants.NODATA);
@@ -413,4 +424,14 @@ public class JobExecutionService {
         return report;
     }
 
+    /**
+     * Get a single report, which happens if no anomalies were detected
+     * or if the job errored.
+     *
+     * @param job the detection job
+     * @return a SUCCESS or ERROR or NODATA report
+     */
+    public AnomalyReport getSingletonReport(JobMetadata job) {
+        return getSingletonReport(job, null);
+    }
 }
