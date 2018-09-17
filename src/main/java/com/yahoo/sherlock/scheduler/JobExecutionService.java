@@ -398,10 +398,9 @@ public class JobExecutionService {
      * or if the job errored.
      *
      * @param job the detection job
-     * @param errorDescription error description (null or empty string if everything is fine)
      * @return a SUCCESS or ERROR or NODATA report
      */
-    public synchronized AnomalyReport getSingletonReport(JobMetadata job, String errorDescription) {
+    public synchronized AnomalyReport getSingletonReport(JobMetadata job) {
         AnomalyReport report = new AnomalyReport();
         report.setJobFrequency(job.getFrequency());
         report.setJobId(job.getJobId());
@@ -412,9 +411,6 @@ public class JobExecutionService {
         if (JobStatus.ERROR.getValue().equals(job.getJobStatus())) {
             log.info("Job [{}] completed with error", job.getJobId());
             report.setStatus(Constants.ERROR);
-            if (errorDescription != null && !errorDescription.isEmpty()) {
-                report.setErrorDescription(errorDescription);
-            }
         } else if (JobStatus.NODATA.getValue().equals(job.getJobStatus())) {
             log.info("No data returned from druid for Job [{}]", job.getJobId());
             report.setStatus(Constants.NODATA);
@@ -429,9 +425,14 @@ public class JobExecutionService {
      * or if the job errored.
      *
      * @param job the detection job
+     * @param errorDescription error description (null or empty string if everything is fine)
      * @return a SUCCESS or ERROR or NODATA report
      */
-    public AnomalyReport getSingletonReport(JobMetadata job) {
-        return getSingletonReport(job, null);
+    public AnomalyReport getSingletonReport(JobMetadata job, String errorDescription) {
+        AnomalyReport report = getSingletonReport(job);
+        if (errorDescription != null && !errorDescription.isEmpty()) {
+            report.setErrorDescription(errorDescription);
+        }
+        return report;
     }
 }
