@@ -27,7 +27,10 @@
 </div>
 <div th:if="${emailError == null}">
     <div th:switch="${#lists.size(Anomalies) > 0}">
-        <div th:case="${false}" class="alert alert-info" role="alert">No anomaly data to show!</div>
+        <div th:case="${false}" class="alert alert-info" role="alert">
+            <div th:if="${error != null}" th:text="${error}">Error message</div>
+            <div th:if="${error == null}">No anomaly data to show!</div>
+        </div>
         <div th:case="${true}">
             <label class="control-label" for="reportTable"><h4>Detailed Report:</h4></label>
             <table id="reportTable" class="table table-striped table-hover table-bordered" th:attr="style=${emailHtml != null ? 'border-collapse: collapse; width: 100%;' : ''}">

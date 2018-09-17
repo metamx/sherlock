@@ -206,6 +206,12 @@ public class CLISettings {
     public static String DISCO_URL;
 
     /**
+     * Continue scheduling jobs on error
+     */
+    @Parameter(names = "--continue-on-error", description = "Continue scheduling jobs on error")
+    public static Boolean CONTINUE_ON_ERROR = false;
+
+    /**
      * Parameters to ignore when printing fields.
      */
     private static String[] PRINT_IGNORED = {"log", "HELP", "REDIS_PASSWORD", "PRINT_IGNORED"};

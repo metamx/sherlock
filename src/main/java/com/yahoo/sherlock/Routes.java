@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Routes logic for web requests.
@@ -661,13 +662,18 @@ public class Routes {
                     selectedDate,
                     frequency
             );
+            Optional<String> errorDescription = Optional.empty();
             List<AnomalyReport> anomalousReports = new ArrayList<>(reports.size());
             for (AnomalyReport report : reports) {
+                if (!errorDescription.isPresent() && report.getErrorDescription() != null) {
+                    errorDescription = Optional.of(report.getErrorDescription());
+                }
                 if (report.getAnomalyTimestamps() != null && !report.getAnomalyTimestamps().isEmpty()) {
                     anomalousReports.add(report);
                 }
             }
             params.put(DatabaseConstants.ANOMALIES, anomalousReports);
+            errorDescription.ifPresent(e -> params.put(Constants.ERROR, e));
             // render the table HTML of the report
             String tableHtml = thymeleaf.render(new ModelAndView(params, "table"));
             response.status(200);

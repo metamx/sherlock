@@ -113,6 +113,10 @@ public class AnomalyReport implements Serializable {
     @Attribute
     private String testName;
 
+    /** Error description. */
+    @Attribute
+    private String errorDescription;
+
     /** Whether this anomaly report contains an anomaly. */
     private boolean hasAnomaly;
 
