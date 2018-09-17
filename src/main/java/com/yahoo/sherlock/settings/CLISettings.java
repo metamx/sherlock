@@ -209,7 +209,7 @@ public class CLISettings {
      * Continue scheduling jobs on error
      */
     @Parameter(names = "--continue-on-error", description = "Continue scheduling jobs on error")
-    public static Boolean CONTINUE_ON_ERROR = false;
+    public static boolean CONTINUE_ON_ERROR = false;
 
     /**
      * Parameters to ignore when printing fields.
