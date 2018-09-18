@@ -92,8 +92,14 @@ public class CLISettings {
     /**
      * Enable email service.
      */
-    @Parameter(names = "--enable-email", description = "training period for egads model for week granularity.")
+    @Parameter(names = "--enable-email", description = "Enable sending reports via email. (default false)")
     public static boolean ENABLE_EMAIL = false;
+
+    /**
+     * Enable PagerDuty service.
+     */
+    @Parameter(names = "--enable-pager", description = "Enable sending reports via pager. (default false)")
+    public static boolean ENABLE_PAGER = false;
 
     /**
      * From email setting.
