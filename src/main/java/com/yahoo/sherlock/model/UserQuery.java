@@ -51,6 +51,9 @@ public class UserQuery {
     /** Email id of the owner. */
     private String ownerEmail;
 
+    /** PagerDuty key of the owner. */
+    private String ownerPDKey;
+
     /** Query end time for custom time-range. */
     private String queryEndTimeText;
 
@@ -90,10 +93,33 @@ public class UserQuery {
      */
     public String getOwnerEmail() {
         if (this.ownerEmail != null) {
-            String[] emails = this.ownerEmail.replace(" ", "").split(Constants.COMMA_DELIMITER);
-            Set<String> setOfEmails = Arrays.stream(emails).collect(Collectors.toSet());
-            this.ownerEmail = setOfEmails.stream().collect(Collectors.joining(Constants.COMMA_DELIMITER));
+            this.ownerEmail = format(this.ownerEmail);
         }
         return this.ownerEmail;
+    }
+
+    /**
+     * Removing duplicate PD keys and return set of comma separated keys.
+     * @return comma separated set of keys
+     */
+    public String getOwnerPDKey() {
+        if (this.ownerPDKey != null) {
+            this.ownerPDKey = format(this.ownerPDKey);
+        }
+        return this.ownerPDKey;
+    }
+
+    /**
+     * Removing duplicate strings and return set of comma separated strings.
+     * @return comma separated set of strings
+     */
+    private String format(String ss) {
+        if (ss != null) {
+            String[] separatedStrings = ss.replace(" ", "").split(Constants.COMMA_DELIMITER);
+            Set<String> setOfStrings = Arrays.stream(separatedStrings).collect(Collectors.toSet());
+            return String.join(Constants.COMMA_DELIMITER, setOfStrings);
+        } else {
+            return ss;
+        }
     }
 }

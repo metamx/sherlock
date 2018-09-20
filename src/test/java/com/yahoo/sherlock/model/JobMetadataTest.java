@@ -33,13 +33,14 @@ public class JobMetadataTest {
     @Test
     public void testParameterConstructor() {
         JobMetadata m = new JobMetadata(
-                1, "b", "c", "d", "e", "f",
+                1, "b", "c", "c1","d", "e", "f",
                 "g", "h", "i", 123, 1234,
                 "m", 4, 1, "n", 3.0, 2, 12, "ts", "ad");
         assertEquals(m.getJobId(), (Integer) 1);
         assertEquals(m.getClusterId(), (Integer) 2);
         assertEquals(m.getOwner(), "b");
         assertEquals(m.getOwnerEmail(), "c");
+        assertEquals(m.getOwnerPDKey(), "c1");
         assertEquals(m.getUserQuery(), "d");
         assertEquals(m.getQuery(), "e");
         assertEquals(m.getTestName(), "f");

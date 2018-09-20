@@ -24,7 +24,6 @@ import com.yahoo.sherlock.query.Query;
 import com.yahoo.sherlock.query.QueryBuilder;
 import com.yahoo.sherlock.service.DetectorService;
 import com.yahoo.sherlock.service.EmailService;
-import com.yahoo.sherlock.service.PagerDutyService;
 import com.yahoo.sherlock.service.ServiceFactory;
 import com.yahoo.sherlock.service.TimeSeriesParserService;
 import com.yahoo.sherlock.settings.CLISettings;
@@ -34,7 +33,6 @@ import com.yahoo.sherlock.store.DruidClusterAccessor;
 import com.yahoo.sherlock.store.JobMetadataAccessor;
 import com.yahoo.sherlock.store.Store;
 import com.yahoo.sherlock.utils.TimeUtils;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -110,7 +108,6 @@ public class JobExecutionService {
                 }
             }
             EmailService emailService = serviceFactory.newEmailServiceInstance();
-            PagerDutyService pagerDutyService = serviceFactory.newPagerDutyService();
             if (reports.isEmpty()) {
                 AnomalyReport report = error.map(e -> getSingletonReport(job, e.getMessage()))
                                             .orElse(getSingletonReport(job));
@@ -129,11 +126,7 @@ public class JobExecutionService {
                 }
                 if (CLISettings.ENABLE_PAGER) {
                     log.info("Sending pager for an anomaly report.");
-                    pagerDutyService.sendPager(
-                        job.getOwner(),
-                        pagerDutyService.filterPagerKeys(job.getOwnerEmail()),
-                        reports
-                    );
+                    serviceFactory.newPagerDutyService().sendPager(job.getOwnerPDKey(), reports);
                 }
             }
             anomalyReportAccessor.putAnomalyReports(reports);
