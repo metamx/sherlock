@@ -24,9 +24,8 @@ public class PagerDutyService
 {
 
   public boolean sendPager(String pagerKeys, List<AnomalyReport> anomalies) {
-
+    if (pagerKeys == null || pagerKeys.trim().isEmpty()) return false;
     PagerDutyEventsClient pagerDutyEventsClient = PagerDutyEventsClient.create();
-
     for (String pagerKey : pagerKeys.split(Constants.COMMA_DELIMITER)) {
       for (AnomalyReport report : anomalies) {
         String sherlockLink = String.format(
