@@ -33,7 +33,6 @@ import com.yahoo.sherlock.store.DruidClusterAccessor;
 import com.yahoo.sherlock.store.JobMetadataAccessor;
 import com.yahoo.sherlock.store.Store;
 import com.yahoo.sherlock.utils.TimeUtils;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -124,6 +123,10 @@ public class JobExecutionService {
                     if (!emailService.sendEmail(job.getOwner(), job.getOwnerEmail(), reports)) {
                         log.error("Error while sending anomaly report email!");
                     }
+                }
+                if (CLISettings.ENABLE_PAGER) {
+                    log.info("Sending pager for an anomaly report.");
+                    serviceFactory.newPagerDutyService().sendPager(job.getOwnerPDKey(), reports);
                 }
             }
             anomalyReportAccessor.putAnomalyReports(reports);

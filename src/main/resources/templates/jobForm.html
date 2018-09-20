@@ -54,6 +54,15 @@
                                 </div>
                             </div>
 
+                            <div class="form-group" th:if="${instantView == null}">
+                                <label class="control-label" for="owner-pager-key">PagerDuty Keys:</label>
+                                <div>
+                                    <input type="text"  id="owner-pager-key" name="owner-pager-key"
+                                           placeholder="Enter the PD Key[s] for notifications"
+                                           class="form-control input-md" required="false"/>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label class="control-label" for="druidCluster">Druid Cluster:</label>
                                 <p id="defaultDruidClusterMsg" class="bg-info">Select a Druid cluster</p>
@@ -281,6 +290,8 @@
           })
           .tokenfield({showAutocompleteOnFocus: false});
 
+    $('#owner-pager-key').tokenfield();
+
     $("#popoverInfo").load('/content/kSigmaTable.html #sensitivityTable');
 
     const $druidCluster = $('#druidCluster');
@@ -333,6 +344,7 @@
         data.testName = $('#test-name').val();
         data.owner = $('#owner-name').val();
         data.ownerEmail = $('#owner-email').tokenfield('getTokensList', ',');
+        data.ownerPDKey = $('#owner-pager-key').tokenfield('getTokensList', ',');
         data.testDescription = $('#test-description').val();
         data.granularity = $('#granularity').val();
         data.granularityRange = $('#granularityRange').val();

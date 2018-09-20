@@ -54,6 +54,14 @@ public class ServiceFactory {
     }
 
     /**
+     * Method to get PagerDutyService instance.
+     * @return PagerDutyService object
+     */
+    public PagerDutyService newPagerDutyService() {
+        return new PagerDutyService();
+    }
+
+    /**
      * Method to get HttpService instance.
      * @return HttpService object
      */

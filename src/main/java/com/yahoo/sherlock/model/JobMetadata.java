@@ -43,6 +43,7 @@ public class JobMetadata implements Serializable {
                 null,
                 userQuery.getOwner(),
                 userQuery.getOwnerEmail(),
+                userQuery.getOwnerPDKey(),
                 userQuery.getQuery(),
                 query == null ? null : query.getQueryJsonObject().toString(),
                 userQuery.getTestName(),
@@ -74,6 +75,7 @@ public class JobMetadata implements Serializable {
                 job.getJobId(),
                 job.getOwner(),
                 job.getOwnerEmail(),
+                job.getOwnerPDKey(),
                 job.getUserQuery(),
                 job.getQuery(),
                 job.getTestName(),
@@ -116,6 +118,12 @@ public class JobMetadata implements Serializable {
      */
     @Attribute
     private String ownerEmail;
+
+    /**
+     * PagerDuty key of the owner.
+     */
+    @Attribute
+    private String ownerPDKey;
 
     /**
      * User query to be stored.
@@ -261,6 +269,7 @@ public class JobMetadata implements Serializable {
             @Nullable Integer jobId,
             String owner,
             String ownerEmail,
+            String ownerPDKey,
             String userQuery,
             String query,
             String testName,
@@ -282,6 +291,7 @@ public class JobMetadata implements Serializable {
         this.jobId = jobId;
         this.owner = owner;
         this.ownerEmail = ownerEmail;
+        this.ownerPDKey = ownerPDKey;
         this.userQuery = userQuery;
         this.query = query;
         this.testName = testName;
@@ -321,6 +331,7 @@ public class JobMetadata implements Serializable {
         }
         setOwner(newJob.getOwner());
         setOwnerEmail(newJob.getOwnerEmail());
+        setOwnerPDKey(newJob.getOwnerPDKey());
         setUserQuery(newJob.getUserQuery());
         setTestName(newJob.getTestName());
         setTestDescription(newJob.getTestDescription());

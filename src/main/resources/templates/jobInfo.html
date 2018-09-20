@@ -71,6 +71,14 @@
                             </div>
 
                             <div class="form-group">
+                                <label class="control-label" for="ownerPDKey">PagerDuty Keys:</label>
+                                <div>
+                                    <input id="ownerPDKey" name="ownerPDKey" type="text" class="form-control input-md"
+                                           size="25" th:value="${job.getOwnerPDKey()}" th:required="false"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
                                 <label class="control-label" for="queryText">Query:</label><br/>
                                 <button id="removeGlyphicon" type="button" class="btn btn-default btn-sm custom-btn">
                                     <span class="glyphicon glyphicon-remove"></span> Remove
@@ -383,6 +391,7 @@
             $('#testDescription').attr("disabled", true);
             $('#ownerName').attr("disabled", true);
             $('#ownerEmail').attr("disabled", true);
+            $('#ownerPDKey').attr("disabled", true);
             $('#queryUrl').attr("disabled", true);
             $('#granularityRange').attr("disabled", true);
             $('#timeseriesRange').attr("disabled", true);
@@ -516,6 +525,7 @@
                 data.testName = $('#testName').val();
                 data.owner = $('#ownerName').val();
                 data.ownerEmail = $('#ownerEmail').tokenfield('getTokensList', ',');
+                data.ownerPDKey = $('#ownerPDKey').tokenfield('getTokensList', ',');
                 data.testDescription = $('#testDescription').val();
                 data.granularity = $('#granularity').val();
                 data.timeseriesRange = $('#timeseriesRange').val();
@@ -565,6 +575,17 @@
                         updateMode();
                    });
 
+        var pdTokens = $('#ownerPDKey').tokenfield();
+
+        pdTokens.on('tokenfield:createdtoken', function (e) {
+                        updateMode();
+                   })
+                   .on('tokenfield:editedtoken', function (e) {
+                        updateMode();
+                   })
+                   .on('tokenfield:removedtoken', function (e) {
+                        updateMode();
+                   });
 
         $("#launchConfirmModalYes").click(function() {
             $.ajax({
