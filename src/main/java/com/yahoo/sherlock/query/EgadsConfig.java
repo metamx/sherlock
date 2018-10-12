@@ -84,7 +84,8 @@ public class EgadsConfig {
         SimpleExponentialSmoothingModel,
         TripleExponentialSmoothingModel,
         WeightedMovingAverageModel,
-        SpectralSmoother;
+        SpectralSmoother,
+        ProphetModel;
 
         /**
          * get all the model names.
@@ -852,12 +853,19 @@ public class EgadsConfig {
      */
     @EgadsParam(name = "FILTERING_METHOD", def = "GAP_RATIO")
     private String filteringMethod;
+
     /**
      * Filtering parameter for the filtering method.
      * Recommended are {@code [0.01, 0.1, 10, 8, 0.99, 0.97]}.
      */
     @EgadsParam(name = "FILTERING_PARAM", def = "0.01")
     private String filteringParam;
+
+    /**
+     * Remote Prophet service url.
+     */
+    @EgadsParam(name = "PROPHET_URL", def = "http://localhost:9090")
+    private String prophetUrl;
 
     /**
      * Create a new EGADS config will all fields
