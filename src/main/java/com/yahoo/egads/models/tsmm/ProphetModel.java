@@ -39,7 +39,6 @@ public class ProphetModel extends TimeSeriesAbstractModel {
   {
     super(config);
     url = config.getProperty(PROPHET_URL);
-    System.out.println("Prophet URL: " + url);
   }
 
   /**
@@ -94,11 +93,11 @@ public class ProphetModel extends TimeSeriesAbstractModel {
   }
 
   /**
-   * Reset the model by emptying the data sequence.
+   * Reset the model by removing the data sequence.
    */
   @Override
   public void reset()
   {
-    dataSequence.clear();
+    dataSequence = null;
   }
 }
