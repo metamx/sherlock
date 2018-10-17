@@ -1,0 +1,17 @@
+version: "2"
+services:
+
+  sherlock:
+
+    build:
+      context: .
+      dockerfile: container/Dockerfile
+
+    image: gcr.io/metamarkets-prod-xpn-host/sherlock
+
+    environment:
+      DISCO_URL: http://disco.metamx.com:8080/v1/anyservice/
+      REDIS_HOST: gcp-metrics-sherlock.metamx-metrics.com
+
+    ports:
+      - 9090:9090
