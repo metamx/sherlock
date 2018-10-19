@@ -7,7 +7,7 @@ RUN echo "Install curl & gettext" && \
 
 COPY container/app /app
 
-COPY target/sherlock-1.0.12-mmx-SNAPSHOT-selfcontained.jar /app/lib/
+COPY target/sherlock-1.0.13-mmx-SNAPSHOT-selfcontained.jar /app/lib/
 
 WORKDIR /app
 
