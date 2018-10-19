@@ -1,0 +1,5 @@
+redis-host = ${REDIS_HOST}
+disco-url = ${DISCO_URL}
+egads-config-filename = conf/egads_config.ini
+continue-on-error = TRUE
+enable-pager = TRUE

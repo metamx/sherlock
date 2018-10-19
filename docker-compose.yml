@@ -1,0 +1,25 @@
+version: "2"
+services:
+
+  sherlock:
+    build:
+      context: .
+      dockerfile: container/app/Dockerfile
+    image: gcr.io/metamarkets-prod-xpn-host/sherlock/app
+
+    environment:
+      DISCO_URL: http://disco.metamx.com:8080/v1/anyservice/
+      REDIS_HOST: gcp-metrics-sherlock.metamx-metrics.com
+
+    ports:
+    - 4080:4080
+
+
+  prophet:
+    build:
+      context: .
+      dockerfile: container/prophet/Dockerfile
+    image: gcr.io/metamarkets-prod-xpn-host/sherlock/prophet
+
+    ports:
+    - 9090:9090
