@@ -17,14 +17,21 @@ import java.util.List;
 
 
 /**
- * The service for sending pagers to the PagerDuty
+ * The service for sending pagers to the PagerDuty.
  */
 @Slf4j
 public class PagerDutyService
 {
-
+  /**
+   * Send pager using PagerDuty service (for every key - anomaly pair).
+   * @param pagerKeys pager key
+   * @param anomalies list of anomalies
+   * @return status
+   */
   public boolean sendPager(String pagerKeys, List<AnomalyReport> anomalies) {
-    if (pagerKeys == null || pagerKeys.trim().isEmpty()) return false;
+    if (pagerKeys == null || pagerKeys.trim().isEmpty()) {
+      return false;
+    }
     PagerDutyEventsClient pagerDutyEventsClient = PagerDutyEventsClient.create();
     for (String pagerKey : pagerKeys.split(Constants.COMMA_DELIMITER)) {
       for (AnomalyReport report : anomalies) {

@@ -35,6 +35,10 @@ public class ProphetModel extends TimeSeriesAbstractModel {
    */
   public static final String PROPHET_URL = "PROPHET_URL";
 
+  /**
+   * Constructor.
+   * @param config should contain properties for the model
+   */
   public ProphetModel(Properties config)
   {
     super(config);
@@ -81,12 +85,12 @@ public class ProphetModel extends TimeSeriesAbstractModel {
     connection.setDoOutput(true);
     connection.setDoInput(true);
     final ObjectMapper objectMapper = new ObjectMapper();
-    try(final OutputStream os = connection.getOutputStream()) {
+    try (final OutputStream os = connection.getOutputStream()) {
       objectMapper.writeValue(os, this.dataSequence);
     }
     final String responseJson = IOUtils.toString(connection.getInputStream(), StandardCharsets.UTF_8.name());
     final List<TimeSeries.Entry> response =
-        objectMapper.readValue(responseJson, new TypeReference<List<TimeSeries.Entry>>(){});
+        objectMapper.readValue(responseJson, new TypeReference<List<TimeSeries.Entry>>() { });
     for (int i = 0; i < dataSequence.size(); i++) {
       dataSequence.set(i, response.get(i));
     }

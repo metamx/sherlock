@@ -72,13 +72,13 @@
         <!-- Left curly goes on end of line (eol). -->
         <module name="LeftCurly">
             <property name="option" value="eol"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="warning"/>
         </module>
 
         <!-- Right curly goes same line as 'else', 'try', and 'catch'. -->
         <module name="RightCurly">
             <property name="option" value="same"/>
-            <property name="severity" value="error"/>
+            <property name="severity" value="warning"/>
         </module>
 
         <!-- Need braces for all code blocks. -->
@@ -119,11 +119,6 @@
 
         <!-- Enforce Java array type style. -->
         <module name="ArrayTypeStyle">
-            <property name="severity" value="error"/>
-        </module>
-
-        <!-- Enforce correct 4 space indentation. -->
-        <module name="Indentation">
             <property name="severity" value="error"/>
         </module>
 

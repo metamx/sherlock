@@ -212,7 +212,7 @@ public class CLISettings {
     public static String DISCO_URL;
 
     /**
-     * Continue scheduling jobs on error
+     * Continue scheduling jobs on error.
      */
     @Parameter(names = "--continue-on-error", description = "Continue scheduling jobs on error")
     public static boolean CONTINUE_ON_ERROR = false;
