@@ -5,11 +5,14 @@
  */
 package com.yahoo.sherlock.query;
 
+import com.yahoo.sherlock.settings.CLISettings;
 import com.yahoo.sherlock.utils.NumberUtils;
 import com.yahoo.sherlock.utils.Utils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
@@ -914,4 +917,28 @@ public class EgadsConfig {
         }
         return config;
     }
+
+    /**
+     * Set an egads config from a file. This method
+     * ignores property values that are invalid.
+     * If configuration fails, then default configuration will be loaded.
+     */
+    public static EgadsConfig fromFile() {
+        EgadsConfig config = new EgadsConfig();
+        try {
+            EgadsConfig.Builder builder = new EgadsConfig.Builder(config);
+            // use the egads config file if available
+            InputStream inputStream = new FileInputStream(CLISettings.EGADS_CONFIG_FILENAME);
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            for (String key : properties.stringPropertyNames()) {
+                builder.setParam(key, properties.getProperty(key));
+            }
+        } catch (Exception e) {
+            log.error("Error, could not load EGADS configuration from file!", e);
+            setToDefault(config, true);
+        }
+        return config;
+    }
+
 }

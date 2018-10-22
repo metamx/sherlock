@@ -252,7 +252,7 @@ public class Routes {
             job.setFrequency(granularity.toString());
             job.setEffectiveQueryTime(intervalEndTime);
             // set egads config
-            EgadsConfig config = new EgadsConfig();
+            EgadsConfig config = EgadsConfig.fromFile();
             config.setTsModel(userQuery.getTsModels());
             config.setAdModel(userQuery.getAdModels());
             // detect anomalies

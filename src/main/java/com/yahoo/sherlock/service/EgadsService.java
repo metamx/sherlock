@@ -15,15 +15,12 @@ import com.yahoo.sherlock.enums.Granularity;
 import com.yahoo.sherlock.exception.SherlockException;
 import com.yahoo.sherlock.model.EgadsResult;
 import com.yahoo.sherlock.query.EgadsConfig;
-import com.yahoo.sherlock.settings.CLISettings;
 import com.yahoo.sherlock.settings.Constants;
 import com.yahoo.sherlock.utils.EgadsUtils;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -116,10 +113,7 @@ public class EgadsService {
     public void preRunConfigure(Double sigmaThreshold, Granularity granularity, Integer granularityRange) {
         if (p == null) {
             log.error("Egads properties have not been set! Attempting to load from file.");
-            configureFromFile();
-            if (p == null) {
-                configureWithDefault();
-            }
+            p = EgadsConfig.fromFile().asProperties();
         }
         p.setProperty("AUTO_SENSITIVITY_SD", sigmaThreshold.toString());
         updateBaseWindow(granularity, granularityRange);
@@ -141,28 +135,6 @@ public class EgadsService {
      */
     public void configureWithDefault() {
         init();
-    }
-
-    /**
-     * Attempt to configure the EGADS service instance
-     * from the provided EGADS config file, the path
-     * to which is set in the {@code CLISettings}.
-     * If configuration fails, then EGADS will load the
-     * default configuration upon run.
-     */
-    public void configureFromFile() {
-        try {
-            // use the egads config file if available
-            InputStream inputStream = new FileInputStream(CLISettings.EGADS_CONFIG_FILENAME);
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            if (!properties.isEmpty()) {
-                p = properties;
-            }
-        } catch (Exception e) {
-            log.error("Error, could not load EGADS configuration from file!", e);
-            p = null;
-        }
     }
 
     /**
