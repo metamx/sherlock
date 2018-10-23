@@ -7,15 +7,14 @@
 package com.yahoo.sherlock.service;
 
 import com.beust.jcommander.internal.Lists;
+import com.yahoo.egads.control.ProcessableObject;
+import com.yahoo.egads.data.Anomaly;
+import com.yahoo.egads.data.TimeSeries;
 import com.yahoo.sherlock.enums.Granularity;
 import com.yahoo.sherlock.exception.SherlockException;
 import com.yahoo.sherlock.query.EgadsConfig;
 import com.yahoo.sherlock.query.QueryBuilderTest;
 import com.yahoo.sherlock.settings.CLISettings;
-import com.yahoo.egads.control.ProcessableObject;
-import com.yahoo.egads.data.Anomaly;
-import com.yahoo.egads.data.TimeSeries;
-
 import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -25,7 +24,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;

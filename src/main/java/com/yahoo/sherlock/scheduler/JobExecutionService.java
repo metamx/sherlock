@@ -19,7 +19,6 @@ import com.yahoo.sherlock.exception.SherlockException;
 import com.yahoo.sherlock.model.AnomalyReport;
 import com.yahoo.sherlock.model.DruidCluster;
 import com.yahoo.sherlock.model.JobMetadata;
-import com.yahoo.sherlock.query.EgadsConfig;
 import com.yahoo.sherlock.query.Query;
 import com.yahoo.sherlock.query.QueryBuilder;
 import com.yahoo.sherlock.service.DetectorService;

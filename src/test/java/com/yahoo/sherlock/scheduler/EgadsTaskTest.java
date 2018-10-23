@@ -9,7 +9,6 @@ import com.yahoo.sherlock.model.JobMetadata;
 import com.yahoo.sherlock.service.DetectorService;
 import com.yahoo.sherlock.settings.Constants;
 import com.yahoo.sherlock.store.redis.LettuceAnomalyReportAccessor;
-
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -18,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;

@@ -138,7 +138,7 @@ public class EgadsService {
 
     /**
      * Configure the current EGADS service instance
-     * with a properties defined in a configuration file
+     * with a properties defined in a configuration file.
      */
     public void configureFromFile() {
         p = EgadsConfig.fromFile();

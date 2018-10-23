@@ -12,7 +12,6 @@ import com.yahoo.sherlock.enums.Granularity;
 import com.yahoo.sherlock.model.AnomalyReport;
 import com.yahoo.sherlock.model.JobMetadata;
 import com.yahoo.sherlock.service.DetectorService;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
