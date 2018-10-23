@@ -31,7 +31,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
@@ -48,35 +47,10 @@ import static org.testng.Assert.assertEquals;
  */
 public class DetectorServiceTest {
 
-    private static DruidQueryService druidQueryService;
     private static HttpService httpService;
-    private static TimeSeriesParserService timeSeriesParserService;
-    private static EgadsService egadsService;
     private static String queryString;
     private static JsonArray fakeDataSources;
     private Gson gson = new Gson();
-
-    private static class MockServiceFactory extends ServiceFactory {
-        @Override
-        public DruidQueryService newDruidQueryServiceInstance() {
-            return druidQueryService;
-        }
-
-        @Override
-        public HttpService newHttpServiceInstance() {
-            return httpService;
-        }
-
-        @Override
-        public TimeSeriesParserService newTimeSeriesParserServiceInstance() {
-            return timeSeriesParserService;
-        }
-
-        @Override
-        protected EgadsService newEgadsServiceInstance() {
-            return egadsService;
-        }
-    }
 
     private static class MockDetectorService extends DetectorService {
     }
@@ -109,7 +83,6 @@ public class DetectorServiceTest {
         anomaly.metricMetaData.source = "filter1, filter2";
         anomaly.addInterval(start, end, 0.5F);
         anomalies.add(anomaly);
-        ServiceFactory mockServiceFactory = new MockServiceFactory();
         fakeDataSources = gson.fromJson("[\"datastore\"]", JsonArray.class);
         DruidQueryService mockDruidQueryService = mock(DruidQueryService.class);
         HttpService mockHttpService = mock(HttpService.class);
@@ -120,10 +93,7 @@ public class DetectorServiceTest {
         when(mockHttpService.queryDruid(Mockito.anyObject(), Mockito.anyObject())).thenReturn(jsonArray);
         when(mockTimeSeriesParserService.parseTimeSeries(Mockito.anyObject(), Mockito.anyObject())).thenReturn(Collections.singletonList(timeseries));
         when(mockEgadsService.runEGADS(Mockito.anyObject(), anyDouble())).thenReturn(anomalies);
-        druidQueryService = mockDruidQueryService;
         httpService = mockHttpService;
-        timeSeriesParserService = mockTimeSeriesParserService;
-        egadsService = mockEgadsService;
     }
 
     private static void inject(Object o, String name, Object v) {
@@ -159,38 +129,53 @@ public class DetectorServiceTest {
 
     private DetectorService ds;
     private EgadsService egads;
+    private EgadsConfig egadsConfig;
     private TimeSeriesParserService ps;
+    private ServiceFactory sf;
 
     private void initMocks() {
         ds = mock(DetectorService.class);
 
-        ps = mock(TimeSeriesParserService.class);
         egads = mock(EgadsService.class);
+        sf = mock(ServiceFactory.class);
+        ps = mock(TimeSeriesParserService.class);
+        egadsConfig = mock(EgadsConfig.class);
+
         inject(ds, "parserService", ps);
-        inject(ds, "egads", egads);
+        inject(ds, "serviceFactory", sf);
+        inject(ds, "egadsConfig", egadsConfig);
+
+        when(sf.newEgadsServiceInstance()).thenReturn(egads);
     }
 
     @Test
     public void testRunDetection() throws SherlockException {
         initMocks();
-        when(ds.runDetection(any(), anyDouble(), any(EgadsConfig.class), anyInt(), anyString(), any(Granularity.class), anyInt()))
+        when(ds.runDetection(any(), any(), anyInt(), any(Granularity.class)))
             .thenReturn(Collections.singletonList(new Anomaly()));
-        when(ds.runDetection(any(JsonArray.class), any(), anyDouble(), any(EgadsConfig.class), anyString(), anyInt()))
+        when(ds.runDetection(any(JsonArray.class), any(), any()))
             .thenCallRealMethod();
         Query query = mock(Query.class);
         when(query.getRunTime()).thenReturn(100000);
         when(query.getGranularity()).thenReturn(Granularity.HOUR);
-        List<Anomaly> response = ds.runDetection(new JsonArray(), query, 0.0, mock(EgadsConfig.class), "day", 1);
+        JobMetadata job = mock(JobMetadata.class);
+        when(job.getSigmaThreshold()).thenReturn(0.0);
+        when(job.getGranularity()).thenReturn("day");
+        when(job.getGranularityRange()).thenReturn(1);
+        List<Anomaly> response = ds.runDetection(new JsonArray(), query, job);
         assertEquals(response.size(), 1);
     }
 
     @Test
     public void testRunDetectionNoConfig() throws Exception {
         initMocks();
-        when(ds.runDetection(any(), anyDouble(), any(EgadsConfig.class), anyInt(), anyString(), any(Granularity.class), anyInt()))
-            .thenReturn(Collections.singletonList(new Anomaly()));
-        when(ds.runDetection(any(), anyDouble(), any(), anyInt(), anyString(), any(Granularity.class), anyInt())).thenCallRealMethod();
-        assertEquals(ds.runDetection(Collections.emptyList(), 0.0, null, 1234, null, null, 1).size(), 0);
+        JobMetadata job = mock(JobMetadata.class);
+        when(job.getSigmaThreshold()).thenReturn(0.0);
+        when(job.getGranularity()).thenReturn("day");
+        when(job.getGranularityRange()).thenReturn(1);
+        when(egads.getP()).thenReturn(egadsConfig);
+        when(ds.runDetection(any(), any(), anyInt(), any(Granularity.class))).thenCallRealMethod();
+        assertEquals(ds.runDetection(Collections.emptyList(), job, 1234, null).size(), 0);
     }
 
     @Test
@@ -201,19 +186,21 @@ public class DetectorServiceTest {
         endSeries.data = new TimeSeries.DataSequence();
         endSeries.data.add(new TimeSeries.Entry(123 * 60, 1000));
         List<TimeSeries> tslist = Lists.newArrayList(endSeries, new TimeSeries());
-        Properties p = new Properties();
-        p.setProperty("AD_MODEL", "model1");
-        when(egads.getP()).thenReturn(p);
+        when(egadsConfig.getAdModel()).thenReturn("model1");
+        when(egads.getP()).thenReturn(egadsConfig);
         when(egads.runEGADS(any(), anyDouble())).thenReturn(anomalies);
-        when(ds.runDetection(any(), anyDouble(), any(EgadsConfig.class), anyInt(), anyString(), any(Granularity.class), anyInt()))
-            .thenCallRealMethod();
-        List<Anomaly> result = ds.runDetection(tslist, 3.0, null, 123, "day", Granularity.DAY, 1);
+        when(ds.runDetection(any(), any(), anyInt(), any(Granularity.class))).thenCallRealMethod();
+        JobMetadata job = mock(JobMetadata.class);
+        when(job.getSigmaThreshold()).thenReturn(3.0);
+        when(job.getGranularity()).thenReturn("day");
+        when(job.getGranularityRange()).thenReturn(1);
+        List<Anomaly> result = ds.runDetection(tslist, job, 123, Granularity.DAY);
         assertEquals(result.size(), 3);
-        result = ds.runDetection(tslist, 3.0, mock(EgadsConfig.class), 123, "day", Granularity.DAY, 1);
+        result = ds.runDetection(tslist, job, 123, Granularity.DAY);
         assertEquals(result.size(), 3);
         verify(egads, times(2)).runEGADS(any(), any());
-        verify(egads, times(1)).preRunConfigure(any(), any(), anyInt());
-        verify(egads, times(1)).configureWith(any());
+        verify(egads, times(2)).preRunConfigure(any(), any(), anyInt());
+        verify(egads, times(2)).configureWith(any());
     }
 
     @Test

@@ -7,14 +7,12 @@
 package com.yahoo.sherlock.utils;
 
 import com.yahoo.egads.data.TimeSeries;
-
+import com.yahoo.sherlock.query.EgadsConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,9 +40,9 @@ public class EgadsUtilsTest {
         series.append(21600L, 77.77f);
         series.append(25200L, 99.99f);
         series.append(36000L, 100.99f);
-        Properties p = new Properties();
-        p.setProperty("AGGREGATION", "1");
-        p.setProperty("FILL_MISSING", "1");
+        EgadsConfig p = new EgadsConfig();
+        p.setAggregation("1");
+        p.setFillMissing("1");
         TimeSeries ts = EgadsUtils.fillMissingData(series, p);
         ts.data.forEach(datapoint -> {
                 Timestamp stamp = new Timestamp(datapoint.time * 1000);

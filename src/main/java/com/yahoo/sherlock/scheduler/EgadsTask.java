@@ -89,7 +89,7 @@ public class EgadsTask implements Runnable {
             proxyJob.setEffectiveQueryTime(effectiveQueryEndTime);
             executionService.getAnomalyReportAccessor().deleteAnomalyReportsForJobAtTime(proxyJob.getJobId().toString(), proxyJob.getReportNominalTime().toString(), proxyJob.getFrequency());
             Granularity granularity = Granularity.getValue(proxyJob.getGranularity());
-            anomalies = detectorService.runDetection(timeSeriesList, proxyJob.getSigmaThreshold(), null, proxyJob.getReportNominalTime(), proxyJob.getFrequency(), granularity, proxyJob.getGranularityRange());
+            anomalies = detectorService.runDetection(timeSeriesList, proxyJob, proxyJob.getReportNominalTime(), granularity);
             reports = executionService.getReports(anomalies, proxyJob);
         } catch (Exception e) {
             log.info("Error in egads job!", e);

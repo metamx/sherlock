@@ -10,12 +10,12 @@ import com.yahoo.egads.control.DetectAnomalyProcessable;
 import com.yahoo.egads.control.ModelAdapter;
 import com.yahoo.egads.control.ProcessableObject;
 import com.yahoo.egads.data.TimeSeries;
+import com.yahoo.sherlock.query.EgadsConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Egads Utility functions.
@@ -112,15 +112,15 @@ public class EgadsUtils {
      * @param p          properties of egads
      * @return complete timeseries
      */
-    public static TimeSeries fillMissingData(TimeSeries timeseries, Properties p) {
+    public static TimeSeries fillMissingData(TimeSeries timeseries, EgadsConfig p) {
         int aggr;
-        if (!NumberUtils.isNonNegativeInt(p.getProperty("AGGREGATION"))) {
+        if (!NumberUtils.isNonNegativeInt(p.getAggregation())) {
             aggr = 1;
         } else {
-            aggr = Integer.parseInt(p.getProperty("AGGREGATION"));
+            aggr = Integer.parseInt(p.getAggregation());
         }
         int fillMissing;
-        if (!NumberUtils.isNonNegativeInt(p.getProperty("FILL_MISSING"))) {
+        if (!NumberUtils.isNonNegativeInt(p.getFillMissing())) {
             fillMissing = 0;
         } else {
             fillMissing = 1;

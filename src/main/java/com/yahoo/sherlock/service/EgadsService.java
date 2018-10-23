@@ -17,13 +17,11 @@ import com.yahoo.sherlock.model.EgadsResult;
 import com.yahoo.sherlock.query.EgadsConfig;
 import com.yahoo.sherlock.settings.Constants;
 import com.yahoo.sherlock.utils.EgadsUtils;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Service class for Egads API.
@@ -35,13 +33,13 @@ public class EgadsService {
     /**
      * To store the egads config.
      */
-    private Properties p = null;
+    private EgadsConfig p = null;
 
     /**
      * Default configuration of egads.
      */
     private void init() {
-        p = EgadsConfig.create().buildDefault().asProperties();
+        p = EgadsConfig.create().buildDefault();
     }
 
     /**
@@ -68,13 +66,14 @@ public class EgadsService {
                 break;
             case MONTH:
                 w2 = String.valueOf(Math.round(12.0f / granularityRange));
-                p.setProperty("PERIOD", "-1");
+                p.setPeriod("-1");
                 break;
             default:
                 break;
         }
-        p.setProperty("BASE_WINDOWS", w1 + Constants.COMMA_DELIMITER + w2);
-        log.info("Updated BASE_WINDOWS: {}", p.getProperty("BASE_WINDOWS"));
+        String baseWindows = w1 + Constants.COMMA_DELIMITER + w2;
+        p.setBaseWindows(baseWindows);
+        log.info("Updated BASE_WINDOWS: {}", baseWindows);
     }
 
     /**
@@ -113,9 +112,9 @@ public class EgadsService {
     public void preRunConfigure(Double sigmaThreshold, Granularity granularity, Integer granularityRange) {
         if (p == null) {
             log.error("Egads properties have not been set! Attempting to load from file.");
-            p = EgadsConfig.fromFile().asProperties();
+            configureFromFile();
         }
-        p.setProperty("AUTO_SENSITIVITY_SD", sigmaThreshold.toString());
+        p.setAutoSensitivityStandardDeviation(sigmaThreshold.toString());
         updateBaseWindow(granularity, granularityRange);
     }
 
@@ -126,7 +125,7 @@ public class EgadsService {
      * @param config EGADS configuration object
      */
     public void configureWith(EgadsConfig config) {
-        p = config.asProperties();
+        p = config;
     }
 
     /**
@@ -135,6 +134,14 @@ public class EgadsService {
      */
     public void configureWithDefault() {
         init();
+    }
+
+    /**
+     * Configure the current EGADS service instance
+     * with a properties defined in a configuration file
+     */
+    public void configureFromFile() {
+        p = EgadsConfig.fromFile();
     }
 
     /**
@@ -170,10 +177,8 @@ public class EgadsService {
     @SuppressWarnings("unchecked")
     public EgadsResult detectAnomaliesResult(TimeSeries timeseries) throws SherlockException {
         try {
-            EgadsConfig config = EgadsConfig.fromProperties(p);
             // For now, instant query will show all anomalies on the graph
-            config.setMaxAnomalyTimeAgo("99999999");
-            p = config.asProperties();
+            p.setMaxAnomalyTimeAgo("99999999");
             ProcessableObject processableObject = getEgadsProcessableObject(timeseries);
             processableObject.process();
             List<Anomaly> anomalies = (List<Anomaly>) processableObject.result();
@@ -193,7 +198,7 @@ public class EgadsService {
      * @return ProcessableObject instance
      */
     protected ProcessableObject getEgadsProcessableObject(TimeSeries timeseries) {
-        return ProcessableObjectFactory.create(EgadsUtils.fillMissingData(timeseries, p), p);
+        return ProcessableObjectFactory.create(EgadsUtils.fillMissingData(timeseries, p), p.asProperties());
     }
 
     /**
@@ -204,6 +209,6 @@ public class EgadsService {
      */
     public void configureDetectionWindow(Integer endTimeMinutes, String frequency, int nLookBack) {
         Long detectionStartTime = (endTimeMinutes - nLookBack * Granularity.getValue(frequency).getMinutes()) * 60L;
-        p.setProperty("DETECTION_WINDOW_START_TIME", detectionStartTime.toString());
+        p.setDetectionWindowStartTime(detectionStartTime.toString());
     }
 }

@@ -9,6 +9,7 @@ package com.yahoo.sherlock.service;
 import com.beust.jcommander.internal.Lists;
 import com.yahoo.sherlock.enums.Granularity;
 import com.yahoo.sherlock.exception.SherlockException;
+import com.yahoo.sherlock.query.EgadsConfig;
 import com.yahoo.sherlock.query.QueryBuilderTest;
 import com.yahoo.sherlock.settings.CLISettings;
 import com.yahoo.egads.control.ProcessableObject;
@@ -155,8 +156,8 @@ public class EgadsServiceTest {
         EgadsService egadsService = new EgadsService();
         egadsService.configureWithDefault();
         egadsService.configureDetectionWindow(61, "hour", 1);
-        Properties p = (Properties) QueryBuilderTest.getValue("p", egadsService);
-        assertEquals(p.getProperty("DETECTION_WINDOW_START_TIME"), "60");
+        EgadsConfig p = (EgadsConfig) QueryBuilderTest.getValue("p", egadsService);
+        assertEquals(p.getDetectionWindowStartTime(), "60");
     }
 
 }

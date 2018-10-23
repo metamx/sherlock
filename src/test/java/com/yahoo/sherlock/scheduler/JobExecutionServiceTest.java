@@ -7,6 +7,11 @@
 package com.yahoo.sherlock.scheduler;
 
 import com.google.gson.JsonArray;
+import com.yahoo.egads.data.Anomaly;
+import com.yahoo.egads.data.MetricMeta;
+import com.yahoo.egads.data.TimeSeries;
+import com.yahoo.sherlock.enums.Granularity;
+import com.yahoo.sherlock.enums.JobStatus;
 import com.yahoo.sherlock.exception.DruidException;
 import com.yahoo.sherlock.exception.SherlockException;
 import com.yahoo.sherlock.model.AnomalyReport;
@@ -20,15 +25,8 @@ import com.yahoo.sherlock.service.TimeSeriesParserService;
 import com.yahoo.sherlock.settings.CLISettings;
 import com.yahoo.sherlock.settings.Constants;
 import com.yahoo.sherlock.store.AnomalyReportAccessor;
-import com.yahoo.sherlock.store.JobMetadataAccessor;
-import com.yahoo.sherlock.enums.JobStatus;
-import com.yahoo.sherlock.enums.Granularity;
-import com.yahoo.sherlock.query.EgadsConfig;
 import com.yahoo.sherlock.store.DruidClusterAccessor;
-import com.yahoo.egads.data.Anomaly;
-import com.yahoo.egads.data.MetricMeta;
-import com.yahoo.egads.data.TimeSeries;
-
+import com.yahoo.sherlock.store.JobMetadataAccessor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -40,7 +38,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -295,16 +292,12 @@ public class JobExecutionServiceTest {
     @Test
     public void testExecuteJobConfigs() throws Exception {
         initMocks();
-        when(ds.detect(any(), anyDouble(), any(), any(EgadsConfig.class), anyString(), anyInt()))
-                .thenReturn(Collections.singletonList(new Anomaly()));
-        when(jes.executeJob(any(), any(), any(), any())).thenCallRealMethod();
-        assertEquals(1, jes.executeJob(new JobMetadata(),
-             new DruidCluster(), mock(Query.class), mock(EgadsConfig.class)).size());
-        when(ds.detect(any(), anyDouble(), any(), any(EgadsConfig.class), anyString(), anyInt()))
-                .thenThrow(new SherlockException());
+        when(ds.detect(any(), any(), any())).thenReturn(Collections.singletonList(new Anomaly()));
+        when(jes.executeJob(any(), any(), any())).thenCallRealMethod();
+        assertEquals(1, jes.executeJob(new JobMetadata(), new DruidCluster(), mock(Query.class)).size());
+        when(ds.detect(any(), any(), any())).thenThrow(new SherlockException());
         try {
-            jes.executeJob(new JobMetadata(),
-                           new DruidCluster(), mock(Query.class), mock(EgadsConfig.class));
+            jes.executeJob(new JobMetadata(), new DruidCluster(), mock(Query.class));
         } catch (SherlockException e) {
             return;
         }

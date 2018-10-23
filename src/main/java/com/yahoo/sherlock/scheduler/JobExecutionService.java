@@ -312,38 +312,15 @@ public class JobExecutionService {
      * @return the list of anomalies from the job
      * @throws SherlockException if an error occurs during execution
      */
-    public List<Anomaly> executeJob(JobMetadata job, DruidCluster cluster, Query query) throws SherlockException {
-        return executeJob(job, cluster, query, null);
-    }
-
-    /**
-     * Execute a job with the specified query and a provided
-     * EGADS config object.
-     *
-     * @param job     job details
-     * @param cluster druid cluster to use
-     * @param query   Druid query to run
-     * @param config  EGADS configuration
-     * @return list of anomalies from the job
-     * @throws SherlockException if an error occurs during execution
-     */
     public List<Anomaly> executeJob(
         JobMetadata job,
         DruidCluster cluster,
-        Query query,
-        EgadsConfig config
+        Query query
     ) throws SherlockException {
         log.info("Executing job with Query [{}]", job.getJobId());
         try {
             DetectorService detectorService = serviceFactory.newDetectorServiceInstance();
-            return detectorService.detect(
-                query,
-                job.getSigmaThreshold(),
-                cluster,
-                config,
-                job.getFrequency(),
-                job.getGranularityRange()
-            );
+            return detectorService.detect(query, cluster, job);
         } catch (Exception e) {
             log.error("Error during job execution [{}]", job.getJobId(), e);
             throw new SherlockException(e.getMessage(), e);
