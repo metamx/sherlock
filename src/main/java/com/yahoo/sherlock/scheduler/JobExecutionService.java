@@ -409,6 +409,7 @@ public class JobExecutionService {
      */
     public AnomalyReport getSingletonReport(JobMetadata job, String errorDescription) {
         AnomalyReport report = getSingletonReport(job);
+        report.setStatus(Constants.ERROR);
         if (errorDescription != null && !errorDescription.isEmpty()) {
             report.setErrorDescription(errorDescription);
         }
