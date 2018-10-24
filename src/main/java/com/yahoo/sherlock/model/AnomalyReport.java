@@ -46,7 +46,7 @@ public class AnomalyReport implements Serializable {
             job.getReportNominalTime(),
             job.getJobId(),
             job.getFrequency(),
-            Constants.WARNING,
+            anomaly.metricMetaData.name.equals(JobStatus.NODATA.getValue()) ? Constants.NODATA : Constants.WARNING,
             anomaly.modelName,
             String.valueOf(job.getSigmaThreshold()),
             job.getTestName()

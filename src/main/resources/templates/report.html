@@ -73,7 +73,13 @@
             $("#rerunButtonContainer").attr("hidden", true);
             $("#tableContainer").html("");
             if (type === "nodata") {
-                $("#rerunButtonContainer").attr("hidden", false);
+                console.log("Report detail retrieve and Rerun button are disabled.");
+                // $("#rerunButtonContainer").attr("hidden", false);
+                $("#selectedTimestamp").val(timestamp);
+                return;
+            }
+            if (type == "success") {
+                console.log("Report detail retrieve is disabled.");
                 $("#selectedTimestamp").val(timestamp);
                 return;
             }
