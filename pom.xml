@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <name>sherlock</name>
     <description>Anomaly detection tool for timeseries data in Druid</description>
-    <version>1.0.16-mmx-SNAPSHOT</version>
+    <version>1.0.17-mmx-SNAPSHOT</version>
 
     <licenses>
         <license>
