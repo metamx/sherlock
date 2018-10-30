@@ -27,7 +27,7 @@ class ProphetHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         df_raw = pd.read_json(request_json, orient='records')
         df = df_raw.rename(index=str, columns={"value": "y"})
-        df['ds'] = pd.to_datetime(df['time'], unit='ms')
+        df['ds'] = pd.to_datetime(df['time'], unit='s')
 
         m = Prophet()
         m.fit(df)

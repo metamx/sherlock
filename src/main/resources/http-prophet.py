@@ -1,3 +1,5 @@
+import logging
+
 import time
 import BaseHTTPServer
 import pandas as pd
@@ -5,9 +7,10 @@ from SocketServer import ThreadingMixIn
 from fbprophet import Prophet
 
 
-HOST_NAME = 'localhost'
+HOST_NAME = '0.0.0.0'
 PORT_NUMBER = 9090
 
+logger = logging.getLogger(__name__)
 
 class ProphetHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(s):
@@ -24,7 +27,7 @@ class ProphetHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         df_raw = pd.read_json(request_json, orient='records')
         df = df_raw.rename(index=str, columns={"value": "y"})
-        df['ds'] = pd.to_datetime(df['time'], unit='ms')
+        df['ds'] = pd.to_datetime(df['time'], unit='s')
 
         m = Prophet()
         m.fit(df)
@@ -49,11 +52,10 @@ class ThreadedHTTPServer(ThreadingMixIn, BaseHTTPServer.HTTPServer):
 if __name__ == '__main__':
     server_class = ThreadedHTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), ProphetHandler)
-    print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
+    logger.info("Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER))
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
     httpd.server_close()
-    print time.asctime(), "Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER)
-
+    logger.info("Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER))
