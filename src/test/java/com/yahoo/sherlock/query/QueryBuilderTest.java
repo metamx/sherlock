@@ -1,5 +1,6 @@
 package com.yahoo.sherlock.query;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.yahoo.sherlock.exception.SherlockException;
 import com.yahoo.sherlock.settings.QueryConstants;
@@ -132,13 +133,37 @@ public class QueryBuilderTest {
         JsonObject granularityJsonObject = query.getQueryJsonObject().getAsJsonObject(QueryConstants.GRANULARITY);
         assertEquals(query.getQueryJsonObject().getAsJsonPrimitive(QueryConstants.INTERVALS).getAsString(), expectedInterval);
         assertTrue(granularityJsonObject.has(QueryConstants.PERIOD));
-        assertTrue(granularityJsonObject.getAsJsonPrimitive(QueryConstants.PERIOD).getAsString().equals(Granularity.DAY.getValue()));
+        assertEquals(granularityJsonObject.getAsJsonPrimitive(QueryConstants.PERIOD).getAsString(), Granularity.DAY.getValue());
         assertTrue(granularityJsonObject.has(QueryConstants.TYPE));
-        assertTrue(granularityJsonObject.getAsJsonPrimitive(QueryConstants.TYPE).getAsString().equals(QueryConstants.PERIOD));
+        assertEquals(granularityJsonObject.getAsJsonPrimitive(QueryConstants.TYPE).getAsString(), QueryConstants.PERIOD);
         assertTrue(granularityJsonObject.has(QueryConstants.TIMEZONE));
-        assertTrue(granularityJsonObject.getAsJsonPrimitive(QueryConstants.TIMEZONE).getAsString().equals(QueryConstants.UTC));
+        assertEquals(granularityJsonObject.getAsJsonPrimitive(QueryConstants.TIMEZONE).getAsString(), QueryConstants.UTC);
         assertTrue(granularityJsonObject.has(QueryConstants.ORIGIN));
-        assertTrue(granularityJsonObject.getAsJsonPrimitive(QueryConstants.ORIGIN).getAsString().equals(expectedOrigin));
+        assertEquals(granularityJsonObject.getAsJsonPrimitive(QueryConstants.ORIGIN).getAsString(), expectedOrigin);
+    }
+
+    @Test
+    public void testEmptyContextMetaData() throws SherlockException, IOException {
+        String queryString = new String(Files.readAllBytes(Paths.get("src/test/resources/druid_query_2.json")));
+        Query query = QueryBuilder.start().queryString(queryString).build();
+        final JsonObject context = query.getQueryObj().getAsJsonObject(QueryConstants.CONTEXT);
+        final JsonObject metaData = context.getAsJsonObject(QueryConstants.META_DATA);
+        assertEquals(metaData.get(QueryConstants.META_TYPE).getAsString(), QueryConstants.META_TYPE_SHERLOCK);
+        assertEquals(metaData.get(QueryConstants.USER_ID).getAsString(), QueryConstants.META_USER_ID);
+    }
+
+    @Test
+    public void testNonEmptyContextMetaData() throws SherlockException, IOException {
+        String queryString = new String(Files.readAllBytes(Paths.get("src/test/resources/druid_query_2.json")));
+        Query query = QueryBuilder.start().queryString(queryString).build();
+        final String expectedMetaType = "meta-type";
+        final String expectedUserId = "user-id";
+        final String contextJson = String.format("{metaData: {type: \"%s\", userId: \"%s\"}}", expectedMetaType, expectedUserId);
+        query.getQueryObj().add(QueryConstants.CONTEXT, new Gson().fromJson(contextJson, JsonObject.class));
+        final JsonObject context = query.getQueryObj().getAsJsonObject(QueryConstants.CONTEXT);
+        final JsonObject metaData = context.getAsJsonObject(QueryConstants.META_DATA);
+        assertEquals(metaData.get(QueryConstants.META_TYPE).getAsString(), expectedMetaType);
+        assertEquals(metaData.get(QueryConstants.USER_ID).getAsString(), expectedUserId);
     }
 
 }

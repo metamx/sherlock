@@ -30,4 +30,11 @@ public class QueryConstants {
     public static final String TYPE = "type";
     public static final String TIMEZONE = "timeZone";
     public static final String UTC = "UTC";
+    public static final String CONTEXT = "context";
+    public static final String META_DATA = "metaData";
+    public static final String META_TYPE = "type";
+    public static final String USER_ID = "userId";
+    public static final String META_TYPE_SHERLOCK = "sherlock";
+    public static final String META_USER_ID = "0";
+
 }

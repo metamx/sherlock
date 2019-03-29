@@ -424,6 +424,30 @@ public class QueryBuilder {
         object.add(QueryConstants.GRANULARITY, granularityObj);
     }
 
+  /**
+   * @param object query json object whose context to update
+   * @param metaType meta type of the query
+   * @param userId meta user id of the query
+   */
+    protected void setObjectContextMetaTypeAndUserId(JsonObject object, String metaType, String userId) {
+      JsonObject context = object.getAsJsonObject(QueryConstants.CONTEXT);
+      if (context == null) {
+        context = new JsonObject();
+        object.add(QueryConstants.CONTEXT, context);
+      }
+      JsonObject meta = context.getAsJsonObject(QueryConstants.META_DATA);
+      if (meta == null) {
+        meta = new JsonObject();
+        context.add(QueryConstants.META_DATA, meta);
+      }
+      if (meta.get(QueryConstants.META_TYPE) == null) {
+        meta.addProperty(QueryConstants.META_TYPE, metaType);
+      }
+      if (meta.get(QueryConstants.USER_ID) == null) {
+        meta.addProperty(QueryConstants.USER_ID, userId);
+      }
+    }
+
     /**
      * @return the build Query object
      * @throws SherlockException if an error occurs while building
@@ -434,6 +458,7 @@ public class QueryBuilder {
         validateJsonObject(queryObj);
         setObjectInterval(queryObj, getInterval(startTime, endTime));
         setObjectGranularity(queryObj, granularity.getValue(), granularityRange, startTime, isBackFillQuery);
+        setObjectContextMetaTypeAndUserId(queryObj, QueryConstants.META_TYPE_SHERLOCK, QueryConstants.META_USER_ID);
         return new Query(queryObj, getStartTime(), getRunTime(), granularity, granularityRange);
     }
 
