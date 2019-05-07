@@ -1,0 +1,39 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sherlock
+  namespace: {{ .Chart.Name }}
+  labels:
+    environment: {{ .Values.environment }}
+    service: {{ .Chart.Name }}
+    type: sherlock
+spec:
+  selector:
+    app: sherlock
+  ports:
+    - protocol: TCP
+      port: 4080
+      targetPort: sherlock-port
+      name: sherlock-http
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: sherlock
+  namespace: {{ .Chart.Name }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx-internal"
+    external-dns.alpha.kubernetes.io/target: internal-ingress.metamx-metrics.com
+  labels:
+    environment: {{ .Values.environment }}
+    service: {{ .Chart.Name }}
+    type: sherlock
+spec:
+  rules:
+  - host: sherlock.metamx-{{ .Values.environment }}.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: sherlock
+          servicePort: 4080

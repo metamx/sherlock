@@ -1,0 +1,24 @@
+environment: dev
+namespace: falcon
+imagePullPolicy: Always
+sherlock:
+  environment:
+    disco_url: http://disco.metamx.com:8080/v1/anyservice/
+    redis_host: redis
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 4000Mi
+    replicas: 1
+    requests:
+      cpu: 1500m
+      memory: 4000Mi
+prophet:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    replicas: 1
+    requests:
+      cpu: 500m
+      memory: 500Mi

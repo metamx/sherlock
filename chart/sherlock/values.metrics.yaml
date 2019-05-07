@@ -1,0 +1,4 @@
+environment: metrics
+sherlock:
+  environment:
+    redis_host: gcp-metrics-sherlock.metamx-metrics.com

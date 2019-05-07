@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    environment: {{ .Values.environment }}
+    service: {{ .Chart.Name }}
+    type: sherlock
+  name: sherlock
+  namespace: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.sherlock.resources.replicas}}
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sherlock
+    spec:
+      containers:
+      - name: sherlock
+        image: gcr.io/metamarkets-prod-xpn-host/sherlock/app:{{ .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        {{- range $key, $value := .Values.sherlock.environment }}
+        - name: {{ $key | upper }}
+          value: {{ $value }}
+        {{- end }}
+        ports:
+        - name: sherlock-port
+          containerPort: 4080
+        readinessProbe:
+          tcpSocket:
+            port: 4080
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 2
+          failureThreshold: 5
+        resources:
+          limits:
+            cpu: {{ .Values.sherlock.resources.limits.cpu }}
+            memory: {{ .Values.sherlock.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.sherlock.resources.requests.cpu }}
+            memory: {{ .Values.sherlock.resources.requests.memory }}
+        terminationMessagePolicy: FallbackToLogsOnError
+      restartPolicy: Always

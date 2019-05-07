@@ -1,0 +1,14 @@
+apiVersion: v1
+appVersion: latest
+description: A Helm chart for sherlock mmx
+engine: gotpl
+icon: https://metamarkets.com/wp-content/themes/metamarkets/images/metamarkets-logo.png
+keywords:
+- sherlock
+maintainers:
+- email: backend@quid.com
+  name: backend
+name: sherlock
+sources:
+- https://github.com/metamx/sherlock
+version: 1.0
