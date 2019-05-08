@@ -1,5 +1,4 @@
 environment: dev
-namespace: falcon
 imagePullPolicy: Always
 sherlock:
   environment:
