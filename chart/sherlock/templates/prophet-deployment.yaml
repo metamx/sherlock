@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    environment: {{ .Values.environment }}
+    service: {{ .Chart.Name }}
+    type: prophet
+  name: prophet
+  namespace: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.prophet.resources.replicas}}
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: prophet
+    spec:
+      containers:
+      - name: prophet
+        image: gcr.io/metamarkets-prod-xpn-host/sherlock/prophet:{{ .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        ports:
+        - name: prophet-port
+          containerPort: 9090
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9090
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 2
+          failureThreshold: 5
+        resources:
+          limits:
+            cpu: {{ .Values.prophet.resources.limits.cpu }}
+            memory: {{ .Values.prophet.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.prophet.resources.requests.cpu }}
+            memory: {{ .Values.prophet.resources.requests.memory }}
+        terminationMessagePolicy: FallbackToLogsOnError
+      restartPolicy: Always
